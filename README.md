@@ -1,4 +1,3 @@
-- [Design goals](#design-goals)
 
 ## Design goals
 
