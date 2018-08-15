@@ -8,7 +8,11 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
-
+template <class... Ts> std::string to_string(Ts &&... ts) {
+  std::ostringstream oss;
+  (oss << ... << std::forward<Ts>(ts));
+  return oss.str();
+}
 // Fold expressions work with all overloads for the supported binary operators,
 // but do not work with arbitrary binary functions. It is possible to implement
 // a workaround for that by providing a wrapper type to hold a value and an
@@ -31,7 +35,6 @@ namespace Tesseract {
 template <typename... T> auto make_even_tuple(T... a) {
   static_assert(sizeof...(a) % 2 == 0, "expected an even number of arguments");
   std::tuple<T...> t{a...};
-
   return t;
 }
 
