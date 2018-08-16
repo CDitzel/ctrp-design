@@ -1,21 +1,26 @@
+
+#include <cstddef>
 #include <iostream>
 #include <string>
+#include <string_view>
+#include <type_traits>
 
-template <template <typename... __Implementation> typename... __Policies>
-struct X : __Policies<X<__Policies...>>... {
-  X() = default;
-  X(__Policies<X> const &... f) : __Policies<X>(f)... {
+template <auto Value, template <typename...> class... __Policies>
+struct X : __Policies<X<Value, __Policies...>>... {
+  constexpr X() = default;
+  constexpr X(__Policies<X> const &... f) : __Policies<X>(f)... {
     std::cout << "default ctor" << std::endl;
   }
 
-  template <typename... __Args>
-  X(__Args &&... args)
-      : __Policies<X<__Policies...>>{std::forward<__Args>(args)}... {
-    std::cout << "perfect forwarding ctor" << std::endl;
-  }
+  // template <typename... __Args>
+  // X(__Args &&... args) : __Policies<X>{std::forward<__Args>(args)}... {
+  //  std::cout << "perfect forwarding ctor" << std::endl;
+  // }
+
+  static inline constexpr auto value = Value;
 };
 
-template <typename Implementation>
+template <typename Implementation, typename I = int>
 struct A {
   A() = default;
   A(int a1) : a1_{a1} {}
@@ -27,14 +32,22 @@ struct A {
 template <typename... __Implementation>
 struct B {
   B() = default;
-  B(std::string b) : b_{b} {}
+  B(std::string_view b) : b_{b} {}
 
   std::string b_;
 };
 
+template <typename Implementation>
+class Stream_t {  // Barton-Nackman
+  friend constexpr auto &operator<<(std::ostream &a, Implementation const &b) {
+    return a << b.value;
+  }
+};
+
 int main() {
-  auto x1 = X<A, B>{};  // Ok
-  auto x2 = X<A, B>{{1, 2}, {std::string("test")}};
+  using X1 = X<1, A, B, Stream_t>;
+  auto x1 = X1{};
+  auto x2 = X<2, A, B>{{1, 2}, {std::string("test")}};
   // auto x3 = X<A, B>{1, 2, std::string("test")};      // Error
-  std::cout << "Hi " << std::endl;
+  std::cout << x1 << std::endl;
 }
