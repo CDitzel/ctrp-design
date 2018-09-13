@@ -8,7 +8,7 @@
 #include <memory>
 #include <stdexcept>
 #include <unordered_map>
-template <class... Ts> std::string to_string(Ts &&... ts) {
+template <typename... Ts> auto to_string(Ts &&... ts) {
   std::ostringstream oss;
   (oss << ... << std::forward<Ts>(ts));
   return oss.str();
@@ -38,7 +38,7 @@ template <typename... T> auto make_even_tuple(T... a) {
   return t;
 }
 
-template <typename T, typename... Ts>
+template <typename T, typename... Ts = decltype(T)>
 void emplace_back_All(
     std::vector<T> &vec,
     Ts... ts) { // "," prevents parameter pack from being folded
@@ -191,15 +191,17 @@ template <typename F, typename A, typename B>
  *                          of a data structure
  * \param container         Arbitrary container conforming to the STL standard
  */
-template <typename C>[[nodiscard]] static auto safe_deref(const C &container) {
-  return [end_it{std::cend(container)}](
-             const auto &iter) -> std::optional<typename C::value_type> {
+namespace {
+template <typename C>[[nodiscard]] auto safe_deref(C const &container) {
+  return [end_it = std::cend(container)](
+             auto const &iter) -> std::optional<typename C::value_type> {
     if (iter != end_it)
       return *iter;
     else
       return std::nullopt;
   };
 }
+} // namespace
 
 /*!
  * \brief insertionSort             In just two lines of code

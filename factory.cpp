@@ -16,12 +16,9 @@ struct IImageFactory {
 struct ImageFactory : IImageFactory {
   std::shared_ptr<Image> Create(std::string_view type) const final {
     static std::map<std::string, std::function<std::shared_ptr<Image>()>>
-        mapping{{"bmp", [] {
-      return std::make_shared<BitmapImage>(); }},
-                {"png", [] {
-      return std::make_shared<PngImage>(); }},
-                {"jpg", []{
-      return std::make_shared<JpgImage>(); }}};
+        mapping{{"bmp", [] { return std::make_shared<BitmapImage>(); }},
+                {"png", [] { return std::make_shared<PngImage>(); }},
+                {"jpg", [] { return std::make_shared<JpgImage>(); }}};
 
     if (auto it = mapping.find(std::data(type)); it != mapping.end())
       return it->second();
