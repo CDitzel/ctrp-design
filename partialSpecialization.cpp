@@ -16,7 +16,8 @@ template <typename T> struct Stack {
 // Out-of-class definition of member function in a class template
 template <typename T> void Stack<T>::set() {}
 
-// Specialization of only a certain member function of a class template
+// Specialization of only a certain non-template member function of a class
+// template
 template <> void Stack<float>::set() {
   std::clog << "float specialization" << std::endl;
 }
@@ -33,7 +34,8 @@ template <> struct Stack<int> {
 };
 
 // Partial specialization of class template for const types
-// Any specialization that is, itself, a template. It still requires further
+// Definition of partial specialization: Any specialization that is, itself,
+// a template. It still requires further
 // "customization" by the user before it can be used
 template <typename T> struct Stack<T const> {
   Stack() { std::cout << "Partial specialization" << std::endl; }
@@ -49,7 +51,7 @@ template <typename U> U Widget::read() {
   std::clog << "generic read" << std::endl;
 }
 
-// Out-of-class specialization of member function template
+// Out-of-class specialization of a member function template
 template <> int Widget::read() { std::clog << "int read" << std::endl; }
 
 // free function template
